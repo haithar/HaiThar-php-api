@@ -25,24 +25,27 @@ class HaiThar {
 	function __call($command, $arguments) {
 		$url = 'https://'.$this->host.'/api/'.$this->api.'/'.$command.'/'.$this->key;
 
+		if (isset($arguments[0]) && is_array($arguments[0])) {
+			$arguments = $arguments[0];
+		} else
+			$arguments = array();
+		
 		if ($this->serviceId !== null)
-			$url .= '/'.$this->serviceId;
+			$arguments['serviceId'] = $this->serviceId;
 
 		$args = '';
-		if (isset($arguments[0]) && is_array($arguments[0])) {
-			foreach ($arguments[0] as $key => $value) {
-				if ($args != '')
-					$args .= '&';
-				else
-					$args = '?';
+		foreach ($arguments as $key => $value) {
+			if ($args != '')
+				$args .= '&';
+			else
+				$args = '?';
 
-				if ($value === false)
-					$value = 0;
-				else if ($value === true)
-					$value = 1;
+			if ($value === false)
+				$value = 0;
+			else if ($value === true)
+				$value = 1;
 
-				$args .= rawurlencode($key).'='.rawurlencode($value);
-			}
+			$args .= rawurlencode($key).'='.rawurlencode($value);
 		}
 
 		$out = file_get_contents($url.$args);
